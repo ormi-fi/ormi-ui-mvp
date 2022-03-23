@@ -22,12 +22,11 @@ export default function Home(props: Props): JSX.Element {
     <Box>
       <Container sx={{ py: "20vh" }} maxWidth="sm">
         <Typography sx={{ mb: 2 }} variant="h1" align="center">
-          Welcome to React Starter Kit!
+          Welcome to Ormi
         </Typography>
 
         <Typography sx={{ mb: 4 }} variant="h3" align="center">
-          The web's most popular front-end template for building web
-          applications with React, Relay, and GraphQL.
+          The web's most popular de-collateralized lending protocol.
         </Typography>
 
         <Box

@@ -201,7 +201,7 @@ module.exports = function config(env, options) {
           ],
         }),
       new webpack.DefinePlugin({
-        "process.env.APP_NAME": JSON.stringify("React App"),
+        "process.env.APP_NAME": JSON.stringify("Ormi"),
         "process.env.APP_ORIGIN": JSON.stringify("http://localhost:3000"),
       }),
       isDevServer && new webpack.HotModuleReplacementPlugin(),

@@ -1,165 +1,270 @@
-/* SPDX-FileCopyrightText: 2014-present Kriasoft <hello@kriasoft.com> */
-/* SPDX-License-Identifier: MIT */
+import MailIcon from '@mui/icons-material/Mail';
+import MenuIcon from '@mui/icons-material/Menu';
+import MoreIcon from '@mui/icons-material/MoreVert';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import SearchIcon from '@mui/icons-material/Search';
+import AppBar from '@mui/material/AppBar';
+import Avatar from '@mui/material/Avatar';
+import Badge from '@mui/material/Badge';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import InputBase from '@mui/material/InputBase';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { alpha, styled } from '@mui/material/styles';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import * as React from 'react';
+import { useHistory } from "../hooks";
 
-import {
-  AppBar,
-  AppBarProps,
-  Avatar,
-  Button,
-  Chip,
-  IconButton,
-  Link,
-  Toolbar,
-  Typography,
-} from "@material-ui/core";
-import { useTheme } from "@material-ui/core/styles";
-import { ArrowDropDown, NotificationsNone } from "@material-ui/icons";
-import * as React from "react";
-import { config } from "../core";
-import { useCurrentUser, useLoginDialog, useNavigate } from "../hooks";
-import { NotificationsMenu, UserMenu } from "../menu";
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginRight: theme.spacing(2),
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(3),
+    width: 'auto',
+  },
+}));
 
-type AppToolbarProps = AppBarProps & {
-  onChangeTheme: () => void;
-};
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
 
-export function AppToolbar(props: AppToolbarProps): JSX.Element {
-  const { sx, onChangeTheme, ...other } = props;
-  const menuAnchorRef = React.createRef<HTMLButtonElement>();
-  const theme = useTheme();
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: '60ch',
+    },
+  },
+}));
 
-  const [anchorEl, setAnchorEl] = React.useState({
-    userMenu: null as HTMLElement | null,
-    notifications: null as HTMLElement | null,
-  });
+export function AppToolbar() {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
-  const loginDialog = useLoginDialog();
-  const navigate = useNavigate();
-  const user = useCurrentUser();
+  const isMenuOpen = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-  function openNotificationsMenu() {
-    setAnchorEl((x) => ({ ...x, notifications: menuAnchorRef.current }));
-  }
+  const handleProfileMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-  function closeNotificationsMenu() {
-    setAnchorEl((x) => ({ ...x, notifications: null }));
-  }
+  const handleMobileMenuClose = () => {
+    setMobileMoreAnchorEl(null);
+  };
 
-  function openUserMenu() {
-    setAnchorEl((x) => ({ ...x, userMenu: menuAnchorRef.current }));
-  }
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    handleMobileMenuClose();
+  };
 
-  function closeUserMenu() {
-    setAnchorEl((x) => ({ ...x, userMenu: null }));
-  }
+  const handleMobileMenuOpen = (event) => {
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
 
-  function signIn(event: React.MouseEvent): void {
-    event.preventDefault();
-    loginDialog.show();
-  }
-
-  return (
-    <AppBar
-      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, ...sx }}
-      color="default"
-      elevation={1}
-      {...other}
+  const menuId = 'primary-search-account-menu';
+  const renderMenu = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
     >
-      <Toolbar>
-        {/* App name / logo */}
-
-        <Typography variant="h1" sx={{ fontSize: "1.5rem", fontWeight: 500 }}>
-          <Link color="inherit" underline="none" href="/" onClick={navigate}>
-            {config.app.name}
-          </Link>
-        </Typography>
-
-        <span style={{ flexGrow: 1 }} />
-
-        {/* Account related controls (icon buttons) */}
-
-        {user && (
-          <Chip
-            sx={{
-              height: 40,
-              borderRadius: 20,
-              fontWeight: 600,
-              backgroundColor: (x) =>
-                x.palette.mode === "light"
-                  ? x.palette.grey[300]
-                  : x.palette.grey[700],
-              ".MuiChip-avatar": { width: 32, height: 32 },
-            }}
-            component="a"
-            avatar={
-              <Avatar
-                alt={user.name || ""}
-                src={user?.picture?.url || undefined}
-              />
-            }
-            label={getFirstName(user.name || "")}
-            onClick={navigate}
-          />
-        )}
-        {user && (
-          <IconButton
-            sx={{
-              marginLeft: (x) => x.spacing(1),
-              backgroundColor: (x) =>
-                x.palette.mode === "light"
-                  ? x.palette.grey[300]
-                  : x.palette.grey[700],
-              width: 40,
-              height: 40,
-            }}
-            children={<NotificationsNone />}
-            onClick={openNotificationsMenu}
-          />
-        )}
-        {user && (
-          <IconButton
-            ref={menuAnchorRef}
-            sx={{
-              marginLeft: (x) => x.spacing(1),
-              backgroundColor: (x) =>
-                x.palette.mode === "light"
-                  ? x.palette.grey[300]
-                  : x.palette.grey[700],
-              width: 40,
-              height: 40,
-            }}
-            children={<ArrowDropDown />}
-            onClick={openUserMenu}
-          />
-        )}
-        {!user && (
-          <Button
-            variant="outlined"
-            href="/auth/google"
-            color="primary"
-            onClick={signIn}
-            children="Log in / Register"
-          />
-        )}
-      </Toolbar>
-
-      {/* Pop-up menus */}
-
-      <NotificationsMenu
-        anchorEl={anchorEl.notifications}
-        onClose={closeNotificationsMenu}
-        PaperProps={{ sx: { marginTop: "8px" } }}
-      />
-      <UserMenu
-        anchorEl={anchorEl.userMenu}
-        onClose={closeUserMenu}
-        PaperProps={{ sx: { marginTop: "8px" } }}
-        onChangeTheme={onChangeTheme}
-      />
-    </AppBar>
+      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+    </Menu>
   );
-}
 
-function getFirstName(displayName: string): string {
-  return displayName && displayName.split(" ")[0];
+  const mobileMenuId = 'primary-search-account-menu-mobile';
+  const renderMobileMenu = (
+    <Menu
+      anchorEl={mobileMoreAnchorEl}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      id={mobileMenuId}
+      keepMounted
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      open={isMobileMenuOpen}
+      onClose={handleMobileMenuClose}
+    >
+      <MenuItem>
+        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+          <Badge badgeContent={4} color="error">
+            <MailIcon />
+          </Badge>
+        </IconButton>
+        <p>Messages</p>
+      </MenuItem>
+      <MenuItem>
+        <IconButton
+          size="large"
+          aria-label="show 17 new notifications"
+          color="inherit"
+        >
+          <Badge badgeContent={17} color="error">
+            <NotificationsIcon />
+          </Badge>
+        </IconButton>
+        <p>Notifications</p>
+      </MenuItem>
+      <MenuItem onClick={handleProfileMenuOpen}>
+        <IconButton
+          size="large"
+          aria-label="account of current user"
+          aria-controls="primary-search-account-menu"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          <Avatar alt="Victor Fei" src="/images/victor.jpg" sx={{ width: 34, height: 34 }} />
+        </IconButton>
+        <p>Profile</p>
+      </MenuItem>
+    </Menu>
+  );
+
+  const history = useHistory();
+  
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="open drawer"
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography
+            variant="h3"
+            noWrap
+            component="div"
+            style={{fontWeight: '700' }} 
+            sx={{ display: { xs: 'none', sm: 'block' } }}
+          >
+            ORMI Protocol
+          </Typography>
+          <MenuItem key={'Dashboard'} onClick={() => {history.push('dashboard')}}>
+            <Typography
+              variant="h4"
+              noWrap
+              component="div"
+              style={{fontWeight: '500' }} 
+              sx={{ display: { xs: 'none', sm: 'block' } }}
+            >
+                Dashboard
+            </Typography>
+          </MenuItem>
+          <MenuItem key={'Markets'} onClick={() => {history.push('markets')}}>
+            <Typography
+              variant="h4"
+              noWrap
+              component="div"
+              style={{fontWeight: '500' }} 
+              sx={{ display: { xs: 'none', sm: 'block' } }}
+            >
+                All Markets
+            </Typography>
+          </MenuItem>
+          <MenuItem key={'Profile'} onClick={() => {history.push('profile')}}>
+            <Typography
+              variant="h4"
+              noWrap
+              component="div"
+              style={{fontWeight: '500' }} 
+              sx={{ display: { xs: 'none', sm: 'block' } }}
+            >
+                Profile
+            </Typography>
+          </MenuItem>
+          <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search token or user name address"
+              inputProps={{ 'aria-label': 'search' }}
+            />
+          </Search>
+          <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
+            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+              <Badge badgeContent={4} color="error">
+                <MailIcon />
+              </Badge>
+            </IconButton>
+            <IconButton
+              size="large"
+              aria-label="show 17 new notifications"
+              color="inherit"
+            >
+              <Badge badgeContent={17} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+            <IconButton
+              size="large"
+              edge="end"
+              aria-label="account of current user"
+              aria-controls={menuId}
+              aria-haspopup="true"
+              onClick={handleProfileMenuOpen}
+              color="inherit"
+            >
+              <Avatar alt="Victor Fei" src="/images/victor.jpg" sx={{ width: 34, height: 34 }} />
+            </IconButton>
+          </Box>
+          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="large"
+              aria-label="show more"
+              aria-controls={mobileMenuId}
+              aria-haspopup="true"
+              onClick={handleMobileMenuOpen}
+              color="inherit"
+            >
+              <MoreIcon />
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      {renderMobileMenu}
+      {renderMenu}
+    </Box>
+  );
 }

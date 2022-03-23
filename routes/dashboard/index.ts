@@ -3,14 +3,14 @@
 
 import { graphql } from "relay-runtime";
 import type { Route } from "../../core";
-import type Home from "./Home";
+import type Home from "./Dashboard";
 import type { homeQueryResponse } from "./__generated__/homeQuery.graphql";
 
 /**
  * Homepage route.
  */
 export default {
-  path: "/",
+  path: "/dashboard",
   query: graphql`
     query homeQuery {
       me {
@@ -21,7 +21,7 @@ export default {
       }
     }
   `,
-  component: () => import(/* webpackChunkName: "home" */ "./Home"),
+  component: () => import(/* webpackChunkName: "home" */ "./Dashboard"),
   response: (data) => ({
     title: "Ormi • The web's most popular de-collateralized lending protocol.",
     description: "The web's most popular de-collateralized lending protocol.",
