@@ -170,15 +170,17 @@ export function AppToolbar() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography
-            variant="h3"
-            noWrap
-            component="div"
-            style={{fontWeight: '700' }} 
-            sx={{ display: { xs: 'none', sm: 'block' } }}
-          >
-            ORMI Protocol
-          </Typography>
+          <MenuItem key={'Dashboard'} onClick={() => {history.push('/')}}>
+            <Typography
+              variant="h3"
+              noWrap
+              component="div"
+              style={{fontWeight: '700' }} 
+              sx={{ display: { xs: 'none', sm: 'block' } }}
+            >
+              ORMI Protocol
+            </Typography>
+          </MenuItem>
           <MenuItem key={'Dashboard'} onClick={() => {history.push('dashboard')}}>
             <Typography
               variant="h4"

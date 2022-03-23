@@ -46,7 +46,7 @@ export default function Home(props: Props): JSX.Element {
           <Button
             variant="outlined"
             size="large"
-            href="https://github.com/kriasoft/react-starter-kit"
+            href="https://github.com/ormi-fi/ormi-ui"
             children="View on GitHub"
             startIcon={<GitHub />}
           />
